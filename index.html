@@ -42,43 +42,54 @@
     </table>
 
     <script>
+        const API_URL = 'https://historical-spangled-throne.glitch.me';
         const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
         const maxCapacity = 5;
-        let reservations = days.map(() => 0);
+        let reservations = {};
+
+        async function fetchReservations() {
+            const response = await fetch(`${API_URL}/reservations`);
+            reservations = await response.json();
+            updateTable();
+        }
+
+        async function updateReservation(day, isChecked) {
+            const response = await fetch(`${API_URL}/reservations`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ day, isChecked }),
+            });
+            reservations = await response.json();
+            updateTable();
+        }
 
         function updateTable() {
             const table = document.getElementById('reservationTable');
             table.innerHTML = '<tr><th>Day</th><th>Status</th><th>Reserve</th></tr>';
 
-            days.forEach((day, index) => {
+            days.forEach((day) => {
                 const row = table.insertRow(-1);
                 row.insertCell(0).textContent = day;
                 
                 const statusCell = row.insertCell(1);
-                const status = reservations[index] >= maxCapacity ? 'Full' : 'Available';
-                statusCell.textContent = `${status} (${reservations[index]}/${maxCapacity})`;
+                const status = reservations[day] >= maxCapacity ? 'Full' : 'Available';
+                statusCell.textContent = `${status} (${reservations[day]}/${maxCapacity})`;
                 statusCell.className = status.toLowerCase();
 
                 const checkboxCell = row.insertCell(2);
                 const checkbox = document.createElement('input');
                 checkbox.type = 'checkbox';
-                checkbox.checked = reservations[index] > 0;
-                checkbox.disabled = reservations[index] >= maxCapacity;
-                checkbox.addEventListener('change', () => handleReservation(index, checkbox.checked));
+                checkbox.checked = reservations[day] > 0;
+                checkbox.disabled = reservations[day] >= maxCapacity;
+                checkbox.addEventListener('change', () => updateReservation(day, checkbox.checked));
                 checkboxCell.appendChild(checkbox);
             });
         }
 
-        function handleReservation(dayIndex, isChecked) {
-            if (isChecked) {
-                reservations[dayIndex]++;
-            } else {
-                reservations[dayIndex] = Math.max(0, reservations[dayIndex] - 1);
-            }
-            updateTable();
-        }
-
-        updateTable();
+        fetchReservations();
+        setInterval(fetchReservations, 5000); // Refresh every 5 seconds
     </script>
 </body>
 </html>
