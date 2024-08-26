@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Room Reservation System</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: center;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .full {
+            background-color: #ffcccc;
+        }
+        .available {
+            background-color: #ccffcc;
+        }
+    </style>
+</head>
+<body>
+    <h1>Room Reservation System</h1>
+    <table id="reservationTable">
+        <tr>
+            <th>Day</th>
+            <th>Status</th>
+            <th>Reserve</th>
+        </tr>
+    </table>
+
+    <script>
+        const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+        const maxCapacity = 5;
+        let reservations = days.map(() => 0);
+
+        function updateTable() {
+            const table = document.getElementById('reservationTable');
+            table.innerHTML = '<tr><th>Day</th><th>Status</th><th>Reserve</th></tr>';
+
+            days.forEach((day, index) => {
+                const row = table.insertRow(-1);
+                row.insertCell(0).textContent = day;
+                
+                const statusCell = row.insertCell(1);
+                const status = reservations[index] >= maxCapacity ? 'Full' : 'Available';
+                statusCell.textContent = `${status} (${reservations[index]}/${maxCapacity})`;
+                statusCell.className = status.toLowerCase();
+
+                const checkboxCell = row.insertCell(2);
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.checked = reservations[index] > 0;
+                checkbox.disabled = reservations[index] >= maxCapacity;
+                checkbox.addEventListener('change', () => handleReservation(index, checkbox.checked));
+                checkboxCell.appendChild(checkbox);
+            });
+        }
+
+        function handleReservation(dayIndex, isChecked) {
+            if (isChecked) {
+                reservations[dayIndex]++;
+            } else {
+                reservations[dayIndex] = Math.max(0, reservations[dayIndex] - 1);
+            }
+            updateTable();
+        }
+
+        updateTable();
+    </script>
+</body>
+</html>
