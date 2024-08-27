@@ -17,7 +17,8 @@
         <form id="bookingForm">
             <label for="date">Choose a date:</label>
             <input type="date" id="date" name="date" required>
-            <button type="submit">Check Availability</button>
+            <button type="button" id="checkAvailability">Check Availability</button>
+            <button type="submit">Book Room</button>
         </form>
         <div id="bookingCount" class="room-status"></div>
         <div id="roomStatus" class="room-status"></div>
@@ -28,7 +29,7 @@
         const bookingCountDiv = document.getElementById('bookingCount');
         const roomStatusDiv = document.getElementById('roomStatus');
         
-        dateInput.addEventListener('change', function() {
+        document.getElementById('checkAvailability').addEventListener('click', function() {
             const date = dateInput.value;
             fetch(`https://historical-spangled-throne.glitch.me/check?date=${date}&checkOnly=true`)
                 .then(response => response.json())
@@ -41,7 +42,7 @@
         document.getElementById('bookingForm').addEventListener('submit', function(e) {
             e.preventDefault();
             const date = dateInput.value;
-            fetch(`https://historical-spangled-throne.glitch.me/check?date=${date}`)
+            fetch(`https://historical-spangled-throne.glitch.me/book?date=${date}`)
                 .then(response => response.json())
                 .then(data => {
                     roomStatusDiv.innerText = data.message;
