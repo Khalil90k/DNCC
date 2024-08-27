@@ -47,22 +47,12 @@
 
         document.getElementById('bookingForm').addEventListener('submit', function(e) {
             e.preventDefault();
-            const name = nameInput.value;
+            const name = nameInput.value.trim();
             const date = dateInput.value;
-            const bookedDates = JSON.parse(localStorage.getItem('bookedDates') || '[]');
-
-            if (bookedDates.includes(date)) {
-                roomStatusDiv.innerText = 'You have already booked the room for this date.';
-                return;
-            }
 
             fetch(`https://historical-spangled-throne.glitch.me/book?date=${date}&name=${encodeURIComponent(name)}`)
                 .then(response => response.json())
                 .then(data => {
-                    if (data.message.includes('booked for you')) {
-                        bookedDates.push(date);
-                        localStorage.setItem('bookedDates', JSON.stringify(bookedDates));
-                    }
                     roomStatusDiv.innerText = data.message;
                 })
                 .catch(error => console.error('Error:', error));
