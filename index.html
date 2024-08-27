@@ -3,93 +3,34 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Room Reservation System</title>
+    <title>Room Booking</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            max-width: 600px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        th, td {
-            border: 1px solid #ddd;
-            padding: 8px;
-            text-align: center;
-        }
-        th {
-            background-color: #f2f2f2;
-        }
-        .full {
-            background-color: #ffcccc;
-        }
-        .available {
-            background-color: #ccffcc;
-        }
+        body { font-family: Arial, sans-serif; }
+        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+        .room-status { margin-top: 20px; }
     </style>
 </head>
 <body>
-    <h1>Room Reservation System</h1>
-    <table id="reservationTable">
-        <tr>
-            <th>Day</th>
-            <th>Status</th>
-            <th>Reserve</th>
-        </tr>
-    </table>
-
+    <div class="container">
+        <h1>Room Booking System</h1>
+        <form id="bookingForm">
+            <label for="date">Choose a date:</label>
+            <input type="date" id="date" name="date" required>
+            <button type="submit">Check Availability</button>
+        </form>
+        <div id="roomStatus" class="room-status"></div>
+    </div>
     <script>
-        const API_URL = 'https://7ae79c62-1f09-4e0b-8b4e-5faa5a0c19bc@api.glitch.com/git/historical-spangled-throne';
-        const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
-        const maxCapacity = 5;
-        let reservations = {};
-
-        async function fetchReservations() {
-            const response = await fetch(`${API_URL}/reservations`);
-            reservations = await response.json();
-            updateTable();
-        }
-
-        async function updateReservation(day, isChecked) {
-            const response = await fetch(`${API_URL}/reservations`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ day, isChecked }),
-            });
-            reservations = await response.json();
-            updateTable();
-        }
-
-        function updateTable() {
-            const table = document.getElementById('reservationTable');
-            table.innerHTML = '<tr><th>Day</th><th>Status</th><th>Reserve</th></tr>';
-
-            days.forEach((day) => {
-                const row = table.insertRow(-1);
-                row.insertCell(0).textContent = day;
-                
-                const statusCell = row.insertCell(1);
-                const status = reservations[day] >= maxCapacity ? 'Full' : 'Available';
-                statusCell.textContent = `${status} (${reservations[day]}/${maxCapacity})`;
-                statusCell.className = status.toLowerCase();
-
-                const checkboxCell = row.insertCell(2);
-                const checkbox = document.createElement('input');
-                checkbox.type = 'checkbox';
-                checkbox.checked = reservations[day] > 0;
-                checkbox.disabled = reservations[day] >= maxCapacity;
-                checkbox.addEventListener('change', () => updateReservation(day, checkbox.checked));
-                checkboxCell.appendChild(checkbox);
-            });
-        }
-
-        fetchReservations();
-        setInterval(fetchReservations, 5000); // Refresh every 5 seconds
+        document.getElementById('bookingForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const date = document.getElementById('date').value;
+            fetch(`https://YOUR_GLITCH_PROJECT.glitch.me/check?date=${date}`)
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('roomStatus').innerText = data.message;
+                })
+                .catch(error => console.error('Error:', error));
+        });
     </script>
 </body>
 </html>
