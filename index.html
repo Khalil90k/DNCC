@@ -9,11 +9,14 @@
         .container { max-width: 600px; margin: 0 auto; padding: 20px; }
         .room-status { margin-top: 20px; }
         .quote { margin-top: 40px; color: purple; font-style: italic; }
+        .week-bookings { margin-top: 20px; }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>Room Booking System</h1>
+        <div id="currentDate" class="room-status"></div>
+        <div id="weekBookings" class="week-bookings"></div>
         <form id="bookingForm">
             <label for="name">Your Name:</label>
             <input type="text" id="name" name="name" required>
@@ -29,10 +32,41 @@
     </div>
     <div class="quote">"Never Settle for Average" - Steve Jobs</div>
     <script>
+        const currentDateDiv = document.getElementById('currentDate');
+        const weekBookingsDiv = document.getElementById('weekBookings');
         const nameInput = document.getElementById('name');
         const dateInput = document.getElementById('date');
         const bookingCountDiv = document.getElementById('bookingCount');
         const roomStatusDiv = document.getElementById('roomStatus');
+
+        function getWeekDates() {
+            const today = new Date();
+            const firstDay = new Date(today.setDate(today.getDate() - today.getDay()));
+            const lastDay = new Date(today.setDate(today.getDate() + 6));
+            return { firstDay, lastDay };
+        }
+
+        function formatDateString(date) {
+            return date.toISOString().split('T')[0];
+        }
+
+        function displayCurrentDateAndWeek() {
+            const { firstDay, lastDay } = getWeekDates();
+            const today = new Date();
+            currentDateDiv.innerText = `Today's Date: ${formatDateString(today)}`;
+            weekBookingsDiv.innerText = `Week: ${formatDateString(firstDay)} - ${formatDateString(lastDay)}`;
+
+            fetch(`https://historical-spangled-throne.glitch.me/week?start=${formatDateString(firstDay)}&end=${formatDateString(lastDay)}`)
+                .then(response => response.json())
+                .then(data => {
+                    let weekInfo = 'Bookings for this week:\n';
+                    for (const [date, names] of Object.entries(data.weekBookings)) {
+                        weekInfo += `${date}: ${names.join(', ') || 'No bookings yet'}\n`;
+                    }
+                    weekBookingsDiv.innerText += '\n' + weekInfo;
+                })
+                .catch(error => console.error('Error:', error));
+        }
 
         document.getElementById('checkAvailability').addEventListener('click', function() {
             const date = dateInput.value;
@@ -57,6 +91,8 @@
                 })
                 .catch(error => console.error('Error:', error));
         });
+
+        window.onload = displayCurrentDateAndWeek;
     </script>
 </body>
 </html>
