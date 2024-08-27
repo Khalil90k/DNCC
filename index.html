@@ -24,7 +24,7 @@
         document.getElementById('bookingForm').addEventListener('submit', function(e) {
             e.preventDefault();
             const date = document.getElementById('date').value;
-            fetch(`https://YOUR_GLITCH_PROJECT.glitch.me/check?date=${date}`)
+            fetch(`https://historical-spangled-throne.glitch.me/check?date=${date}`)
                 .then(response => response.json())
                 .then(data => {
                     document.getElementById('roomStatus').innerText = data.message;
