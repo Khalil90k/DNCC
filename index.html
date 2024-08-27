@@ -8,6 +8,7 @@
         body { font-family: Arial, sans-serif; }
         .container { max-width: 600px; margin: 0 auto; padding: 20px; }
         .room-status { margin-top: 20px; }
+        .quote { margin-top: 40px; color: purple; font-style: italic; }
     </style>
 </head>
 <body>
@@ -18,16 +19,32 @@
             <input type="date" id="date" name="date" required>
             <button type="submit">Check Availability</button>
         </form>
+        <div id="bookingCount" class="room-status"></div>
         <div id="roomStatus" class="room-status"></div>
     </div>
+    <div class="quote">"Never Settle for Average" - Steve Jobs</div>
     <script>
+        const dateInput = document.getElementById('date');
+        const bookingCountDiv = document.getElementById('bookingCount');
+        const roomStatusDiv = document.getElementById('roomStatus');
+        
+        dateInput.addEventListener('change', function() {
+            const date = dateInput.value;
+            fetch(`https://historical-spangled-throne.glitch.me/check?date=${date}&checkOnly=true`)
+                .then(response => response.json())
+                .then(data => {
+                    bookingCountDiv.innerText = `Current bookings: ${data.currentBookings}`;
+                })
+                .catch(error => console.error('Error:', error));
+        });
+
         document.getElementById('bookingForm').addEventListener('submit', function(e) {
             e.preventDefault();
-            const date = document.getElementById('date').value;
+            const date = dateInput.value;
             fetch(`https://historical-spangled-throne.glitch.me/check?date=${date}`)
                 .then(response => response.json())
                 .then(data => {
-                    document.getElementById('roomStatus').innerText = data.message;
+                    roomStatusDiv.innerText = data.message;
                 })
                 .catch(error => console.error('Error:', error));
         });
