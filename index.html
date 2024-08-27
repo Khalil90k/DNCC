@@ -18,7 +18,7 @@
             <label for="date">Choose a date:</label>
             <input type="date" id="date" name="date" required>
             <button type="button" id="checkAvailability">Check Availability</button>
-            <button type="submit">Book Room</button>
+            <button type="submit" id="bookRoom">Book Room</button>
         </form>
         <div id="bookingCount" class="room-status"></div>
         <div id="roomStatus" class="room-status"></div>
@@ -31,7 +31,7 @@
         
         document.getElementById('checkAvailability').addEventListener('click', function() {
             const date = dateInput.value;
-            fetch(`https://historical-spangled-throne.glitch.me/check?date=${date}&checkOnly=true`)
+            fetch(`https://historical-spangled-throne.glitch.me/check?date=${date}`)
                 .then(response => response.json())
                 .then(data => {
                     bookingCountDiv.innerText = `Current bookings: ${data.currentBookings}`;
